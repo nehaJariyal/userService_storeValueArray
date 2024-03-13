@@ -4,7 +4,7 @@ const port =  6379;
 class RedisHelper {
     private client:any;
     constructor() {
-        this.client = createClient({url:`redis://redis:${port}`});
+        this.client = createClient({url:`redis://localhost:${port}`});
          this.client.connect();
         this.client.on('connect', () => {
             console.log('Redis Connected');

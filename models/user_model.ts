@@ -6,22 +6,26 @@ export interface User {
     age: number
     email: string;
     password: string
-}
-redisHelper;
-export class UserModel {
+ }
+ redisHelper;
+ export class UserModel {
 
    private users: User[] = [];
 
-    addUser(user: User) {
-        redisHelper.setString("USERS",JSON.stringify(user));
+  addUser(user:User){
+ this.users.push(user)
+ }
+
+    addUserRedis(user: User) {
+        // redisHelper.setString("USERS",JSON.stringify([user]));
         this.users.push(user)   
+        redisHelper.setString("USERS",JSON.stringify(this.users));
     }
-    redis_cli_set(newUser: User) {
-        // client.set(`users:${newUser}`, JSON.stringify(newUser));
+    
+    getUserRedis(user: User) {
+        redisHelper.getString("USERS");
     }
-    redis_cli_get(newUser:User){
-        // client.get(`users:${newUser}`);
-    }
+    
     
     getUserByMail(email: string): User | undefined {
         return  this.users.find(user =>  user.email === email);
@@ -40,5 +44,15 @@ export class UserModel {
                 return obj;
             }
         })
+    }
+    deleteUserByMail(email: string): any{
+        const userIndex = this.users.findIndex((user) => user.email === email);
+        if (userIndex !== -1) {
+            
+            this.users.splice(userIndex, 1);
+            redisHelper.setString("USERS",JSON.stringify(this.users));
+            return true;
+        }
+        return false;
     }
 }
