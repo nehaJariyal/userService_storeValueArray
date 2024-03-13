@@ -45,7 +45,7 @@ export interface User {
             }
         })
     }
-    deleteUserByMail(email: string): any{
+    deleteUserByMail(email: string): User|boolean{
         const userIndex = this.users.findIndex((user) => user.email === email);
         if (userIndex !== -1) {
             
