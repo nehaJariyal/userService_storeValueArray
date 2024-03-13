@@ -103,7 +103,6 @@ class RedisHelper {
                 if (err) {
                     return reject(err);
                 }
-                // Add Expire Time if provided
                 if (expires !== 0) {
                     this.client.expire(key, (expires * 1));
                 }
