@@ -1,6 +1,6 @@
-import e, { Request, Response } from "express";
-import bodyParser from "body-parser";
-import { UserModel, User } from '../models/user_model';
+import express, { Request, Response } from "express";
+import bodyParser, { json } from "body-parser";
+import { UserModel, User, Product } from '../models/user_model';
 import redisHelper from "../helper/redisHelper";
 redisHelper;
 const userModel = new UserModel()
@@ -57,8 +57,8 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
-export const getProfile = async (req: Request, res: Response) => {
-    const user_email = req.params.email
+export const getProfile = async (req: any, res: Response) => {
+    const user_email :string= req.query.email;
     const userMail = userModel.getUserByMail(user_email)
     if (userMail) {
         res.status(200).json({ data: userMail })
@@ -105,8 +105,8 @@ export const getDatabyid = (req: Request, res: Response) => {
 
 }
 
-export const deleteUser = async (req: Request, res: Response) => {
-    const { email } = req.params;
+export const deleteUser = async (req: any, res: Response) => {
+    const  email = req.query.email;
 
     if (!email) {
         return res.status(400).json({ message: 'Email parameter is missing' });
@@ -125,3 +125,29 @@ export const deleteUser = async (req: Request, res: Response) => {
         return res.status(404).json({ message: `Email ${email} not found` });
     }
 };
+
+export const userProduct= async (req:any ,res:Response)=>{
+const {
+product,
+category
+}=req.body 
+
+const addProduct: Product = {
+    product,
+    category
+    }
+    userModel.addProduct(addProduct)
+       await redisHelper.hashSet("USERPRODCUT",category , product);
+       const resp=await redisHelper.hashGet("USERPRODCUT",category);
+        res.status(200).json({data:resp,code:200,message:"Request done successfully" })     
+}
+
+export const deleteDB= async (req:any, res:Response)=>{
+    try{
+    const key=req.body
+redisHelper.destroyDb(key)
+res.status(200).json({ code:200,message :"destroy db sucessfully"})
+    }catch(e){
+        console.log(e)
+    }
+} 

@@ -7,17 +7,25 @@ export interface User {
     email: string;
     password: string
  }
+ export interface Product{ 
+category:string
+product:string
+}
+ 
  redisHelper;
  export class UserModel {
 
    private users: User[] = [];
+   private product: Product[] = [];
 
   addUser(user:User){
  this.users.push(user)
  }
-
+ addProduct(product:Product){
+    this.product.push(product)
+}
+    
     addUserRedis(user: User) {
-        // redisHelper.setString("USERS",JSON.stringify([user]));
         this.users.push(user)   
         redisHelper.setString("USERS",JSON.stringify(this.users));
     }

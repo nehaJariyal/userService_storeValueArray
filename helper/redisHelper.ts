@@ -1,14 +1,19 @@
-import {createClient} from "redis"
 const rdUrl:any="redis:6379";
+import {createClient} from "redis"
 const port =  6379;
+// const host= "localhost"
+const host= "redis"
 class RedisHelper {
     private client:any;
     constructor() {
-        this.client = createClient({url:`redis://localhost:${port}`});
+        this.client = createClient({url:`redis://${host}:${port}`});
          this.client.connect();
+
         this.client.on('connect', () => {
             console.log('Redis Connected');
-        });
+        }); 
+        
+
     }
     async setString(key:any, value:any, expires = 0, database = '') {
         try{
@@ -18,7 +23,7 @@ class RedisHelper {
         return new Promise((resolve, reject) => {
             this.client.set(key, value, (err:any, reply:any) => {
                 if (err) {
-                    console.log("hererer",err);
+                    console.log("error",err);
                     return reject(err);
                 }
                 // Add Expire Time if provided
@@ -29,7 +34,7 @@ class RedisHelper {
             });
         });
     }catch(err:any){
-        console.log("dafadsfdsdasdsf",err)
+        console.log(" setstring  error",err)
     }
     }
     async getString(key:any, database = '') {
@@ -57,24 +62,33 @@ class RedisHelper {
             });
         });
     }
-    async hashSet(key:any, field:any, values:any, expires = 0, database = '') {
-        if (database !== '') {
-            this.client.select(database);
-        }
-        return new Promise((resolve, reject) => {
-            this.client.hset(key, field, values, (err:any, reply:any) => {
-                if (err) {
-                    return reject(err);
-                }
-                // Add Expire Time if provided
-                if (expires !== 0) {
-                    this.client.expire(key, (expires * 1));
-                }
-                resolve(reply);
+    async hashSet(key:any, field:any, values:any, expires = 0, database = '0') {
+        try{ 
+
+            if (database !== '') {
+                this.client.select(database);
+                
+            }
+            return new Promise((resolve, reject) => {
+                this.client.hSet(key, field, values, (err:any, reply:any) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    if (expires !== 0) {
+                        this.client.expire(key, (expires * 1));
+                    }
+                    resolve(reply);
+                });
             });
-        });
+        }
+        catch(e:any){
+            console.log(e);
+        }
+        
+
     }
-    async hashGet(key:any, field:any, database = '') {
+
+        async hashGet(key:any, field:any, database = '') {
         return new Promise((resolve, reject) => {
             this.client.hget(key, field, (err:any, reply:any) => {
                 if (err) {

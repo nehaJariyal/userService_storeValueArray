@@ -18,7 +18,9 @@ class UserRoutes {
             .get('/login',UserController.login)
             .get('/profile',UserController.getProfile)
             .get('/allData',UserController.getAllUsers)
-            .delete("/user/:email", UserController.deleteUser);
+            .delete('/deleteUser', UserController.deleteUser)
+            .post('/product',UserController.userProduct)
+            .post("/deletedb",UserController.deleteDB)
     }
 }
 
